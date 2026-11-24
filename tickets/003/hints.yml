@@ -1,0 +1,10 @@
+# Errors a fix for this ticket often runs into, and a nudge for each. A hint shows when a crash's message matches.
+- match: "undefined method 'options' for nil"
+  hint: >-
+    The page broke reading the limit back from the model. `Note.validators_on(:body)` lists every validator on the
+    body, presence as well as length, so look for the length validator by its class,
+    `ActiveModel::Validations::LengthValidator`, before reading its `options[:maximum]`.
+- match: "Unable to find button \"Post note\""
+  hint: >-
+    The tests post a note by pressing the button named Post note, the way a hiker does. Keep the button's words, or
+    put them back.

@@ -1,0 +1,8 @@
+- **Where is your test?** Is there a test in your change that failed before your fix? The counter runs in the browser, so a test for it needs one: a system test with headless Chrome. Which parts could an ordinary integration test check instead?
+- **Where does the 500 live now?** If someone changed the validation to 600, what else would have to change? A constant the validation uses, or reading it back with `Note.validators_on(:body)`, keeps it in one place. Which did you pick, and why?
+- **How do you count?** Type 🥾 and 👨‍👩‍👧 and compare your counter with what Rails says. Can you say why `value.length` disagrees with Rails?
+- **What does a screen reader hear while the hiker types?** A number after every letter, or once they pause? Try it with VoiceOver or TalkBack.
+- **What happens without JavaScript?** Turn it off, then post a note with line breaks. The browser sends each line break as two characters, so the server can count more than your counter would show. Did you notice? It's out of scope, but worth a ticket.
+- **Did you block anything?** `maxlength` cuts off pasted text with no warning: words lost, the same kind of problem as ticket 001.
+- **Does it fit on a phone?** Look at the form on a narrow screen. Is the Post note button still in reach?
+- **Does your commit message say why,** not only what?

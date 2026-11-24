@@ -1,0 +1,72 @@
+diff --git a/app/javascript/controllers/character_count_controller.js b/app/javascript/controllers/character_count_controller.js
+new file mode 100644
+index 0000000..f58271d
+--- /dev/null
++++ b/app/javascript/controllers/character_count_controller.js
+@@ -0,0 +1,31 @@
++import { Controller } from "@hotwired/stimulus"
++
++// Counts the way Rails' length validation does: one for each code point, so 🥾 is one character, not two.
++export default class extends Controller {
++  static targets = [ "input", "count", "announcement" ]
++  static values = { limit: Number }
++
++  connect() {
++    this.show()
++  }
++
++  disconnect() {
++    clearTimeout(this.pause)
++  }
++
++  update() {
++    this.show()
++    // A screen reader hears the count once the hiker pauses, not after every key.
++    clearTimeout(this.pause)
++    this.pause = setTimeout(() => { this.announcementTarget.textContent = this.countTarget.textContent }, 1000)
++  }
++
++  show() {
++    const left = this.limitValue - Array.from(this.inputTarget.value).length
++    this.countTarget.textContent = left < 0 ? `${this.#characters(-left)} over the limit` : `${this.#characters(left)} left`
++  }
++
++  #characters(count) {
++    return `${count} ${count === 1 ? "character" : "characters"}`
++  }
++}
+diff --git a/app/models/note.rb b/app/models/note.rb
+index 3d4f8dd..8a489e2 100644
+--- a/app/models/note.rb
++++ b/app/models/note.rb
+@@ -2,7 +2,9 @@ class Note < ApplicationRecord
+   belongs_to :trail
+   belongs_to :author, class_name: "User"
+ 
+-  validates :body, presence: true, length: { maximum: 500 }
++  BODY_LIMIT = 500
++
++  validates :body, presence: true, length: { maximum: BODY_LIMIT }
+ 
+   after_create_commit -> { broadcast_prepend_to trail, target: "notes" }
+   after_create_commit -> { NotifyFollowersJob.perform_later(self) }
+diff --git a/app/views/trails/show.html.erb b/app/views/trails/show.html.erb
+index 2fc8bd3..627f483 100644
+--- a/app/views/trails/show.html.erb
++++ b/app/views/trails/show.html.erb
+@@ -11,8 +11,13 @@
+       <%= button_to "Follow this trail", trail_follow_path(@trail), class: "text-sm text-emerald-800 underline" %>
+     <% end %>
+   </div>
+-  <%= form_with model: [ @trail, @note ], class: "mt-6 flex gap-3" do |form| %>
+-    <%= form.text_area :body, rows: 2, placeholder: "How was the trail?", class: "flex-1 rounded border border-stone-300 p-2" %>
++  <%= form_with model: [ @trail, @note ], class: "mt-6 flex gap-3", data: { controller: "character-count", character_count_limit_value: Note::BODY_LIMIT } do |form| %>
++    <div class="flex-1">
++      <%= form.text_area :body, rows: 2, placeholder: "How was the trail?", class: "w-full rounded border border-stone-300 p-2",
++            aria: { describedby: "note_body_count" }, data: { character_count_target: "input", action: "character-count#update" } %>
++      <p id="note_body_count" class="text-sm text-stone-500" data-character-count-target="count">Up to <%= Note::BODY_LIMIT %> characters.</p>
++      <p class="sr-only" aria-live="polite" data-character-count-target="announcement"></p>
++    </div>
+     <%= form.submit "Post note", class: "self-start rounded bg-emerald-700 px-4 py-2 font-semibold text-white" %>
+   <% end %>
+ <% else %>

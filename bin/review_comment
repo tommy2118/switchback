@@ -8,7 +8,8 @@ ticket, output_path = ARGV
 output = File.read(output_path)
 root = File.expand_path("..", __dir__)
 folder = File.join(root, "tickets", ticket)
-marks = output.scan(/^Ticket\d+Test#(test_.+?) = [\d.]+ s = ([.FES])$/).to_h
+# A browser test can print between a test's name and its result, such as where it saved a screenshot.
+marks = output.scan(/^Ticket\d+Test#(test_.+?) = (?:.*\n)*?[\d.]+ s = ([.FES])$/).to_h
 # Minitest prints each problem as "Failure:" or "Error:", the test's name, then its message.
 messages = output.scan(/^(?:Failure|Error):\nTicket\d+Test#(test_\S.*?)(?: \[.*?\])?:\n(.+)$/).to_h
 criteria = File.read(File.join(folder, "acceptance_test.rb")).scan(/^\s*test "(.+)" do$/).flatten
