@@ -28,3 +28,4 @@ You'll learn more if you look after you've tried.
 
 - [001: Notes vanish sometimes](001-notes-vanish.md)
 - [002: Eagle Ridge's page is slow](002-eagle-ridge-slow.md)
+- [003: Long notes get rejected](003-long-notes-rejected.md), after 001
