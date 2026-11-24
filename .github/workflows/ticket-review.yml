@@ -1,0 +1,59 @@
+# Reviews a pull request whose branch starts with a ticket number, such as 001-notes-vanish: runs that ticket's
+# acceptance tests and comments on what passes. The tests live on Switchback's review branch, not in this code.
+name: Ticket review
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    if: ${{ github.head_ref != '' }}
+    runs-on: ubuntu-latest
+    env:
+      BRANCH: ${{ github.head_ref }}
+      UPSTREAM: tommy2118/switchback
+    steps:
+      - name: Find the ticket
+        id: ticket
+        run: echo "number=$(printf '%s' "$BRANCH" | grep -oE '^[0-9]{3}' || true)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout code
+        if: steps.ticket.outputs.number != ''
+        uses: actions/checkout@v6
+
+      - name: Checkout the ticket's review
+        if: steps.ticket.outputs.number != ''
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.UPSTREAM }}
+          ref: review
+          path: .review
+
+      - name: Set up Ruby
+        if: steps.ticket.outputs.number != ''
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Run the acceptance tests
+        if: steps.ticket.outputs.number != ''
+        env:
+          RAILS_ENV: test
+          TICKET: ${{ steps.ticket.outputs.number }}
+        run: |
+          mkdir -p test/acceptance
+          cp ".review/tickets/$TICKET/acceptance_test.rb" test/acceptance/
+          bin/rails db:test:prepare
+          bin/rails test test/acceptance --verbose > acceptance.txt 2>&1 || true
+          ruby .review/bin/review_comment "$TICKET" acceptance.txt > comment.md
+
+      - name: Comment on the pull request
+        if: steps.ticket.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file comment.md
