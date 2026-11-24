@@ -6,7 +6,8 @@ worked in. The trails, hikers and notes are invented.
 
 ## Run it
 
-You need Ruby 4.0.10 (see `.ruby-version`).
+You need Ruby 4.0.10 (see `.ruby-version`). With [mise](https://mise.jdx.dev), `mise install` in this folder gets it;
+rbenv and asdf read `.ruby-version` too.
 
 ```sh
 bin/setup
