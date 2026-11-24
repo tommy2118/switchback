@@ -16,6 +16,12 @@ class NoteFormsTest < ApplicationSystemTestCase
     assert_text "480 characters left"
   end
 
+  test "an emoji counts as one character, the way the server counts it" do
+    note_box.send_keys("Wade the creek 🥾🥾")
+
+    assert_text "483 characters left"
+  end
+
   test "the hiker can type past the limit, keeps every word, and hears how far over" do
     note_box.send_keys("a" * 537)
 
