@@ -1,0 +1,10 @@
+# Errors a fix for this ticket often runs into, and a nudge for each. A hint shows when a crash's message matches.
+- match: "The User association named `:author` cannot be lazily loaded"
+  hint: >-
+    Strict loading did its job: it stopped a note from loading its author on its own, which is the N+1 itself. Now
+    load the authors together with the notes, with `includes`, `preload` or `eager_load`.
+- match: "The Trail association named `:trail` cannot be lazily loaded"
+  hint: >-
+    Strict loading is on for every note, not only the notes the trail's page draws. The job that emails followers
+    loads one note by itself and reads its trail and author, and nothing loaded those ahead of time. Turn strict
+    loading on only where the page loads its notes.

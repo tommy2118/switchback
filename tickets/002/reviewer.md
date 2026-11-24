@@ -1,0 +1,7 @@
+- **Where is your test?** Is there a test in your change that failed before your fix, and would catch the N+1 if it came back?
+- **Where do the authors get loaded,** in the controller or in the view? Why there? If you set `@notes` in `TrailsController#show`, the trail page is also drawn by ticket 001's fix when a note is too long. Does that page still work?
+- **Which did you use: `includes`, `preload` or `eager_load`?** Read the SQL each one makes in the log. Can you say when you'd pick each?
+- **What did the log's `Completed` line say before and after?** Show the reviewer the numbers.
+- **Did you think about strict loading?** It turns the next N+1 into an error. Where would you turn it on, and what else would it stop?
+- **Does your commit message say why,** not only what?
+- **Anything you noticed but left alone?** Hundreds of notes on one page is still a lot to draw. Showing fewer at a time is a good next ticket, and the product manager's call.
