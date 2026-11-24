@@ -8,11 +8,17 @@ class Ticket001Test < ActionDispatch::IntegrationTest
 
   def post_note(body) = post trail_notes_path(trails(:eagle_ridge)), params: { note: { body: } }
 
+  # An error page can contain any text, so check that the form came back before reading what it says.
+  def assert_form_shown_again
+    assert_includes [ 200, 422 ], response.status, "the trail page should come back with the form, not an error page"
+  end
+
   test "a note over 500 characters isn't saved, and the hiker is told why" do
     assert_no_difference -> { Note.count } do
       post_note LONG
     end
-    assert_match(/too long/i, response.body)
+    assert_form_shown_again
+    assert_match(/too long|500/i, response.body)
   end
 
   test "the hiker's words stay in the form, so nothing they wrote is lost" do
@@ -28,6 +34,7 @@ class Ticket001Test < ActionDispatch::IntegrationTest
   test "Note posted. shows only when a note was saved" do
     post_note LONG
     follow_redirect! if response.redirect?
+    assert_form_shown_again
     assert_no_match "Note posted.", response.body
   end
 

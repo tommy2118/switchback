@@ -15,6 +15,10 @@ the note isn't in the list. Nothing deletes notes: this one was never saved.
 4. "Note posted." shows only when a note was saved.
 5. A note of 500 characters still posts as before.
 
+Criterion 3 doesn't come from the reporter. It's how Turbo works: after a form posts, Turbo draws the page it gets
+back only when the status says the form failed (422) or when it's a redirect. A plain 200 leaves the old page in
+place, so the hiker sees nothing happen. The form posts as HTML, so the answer is an HTML page, not a Turbo Stream.
+
 ## Out of scope
 - Changing the 500-character limit.
 - Showing the limit, or a character counter, before the hiker hits it. A good next ticket.

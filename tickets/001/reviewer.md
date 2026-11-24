@@ -1,5 +1,5 @@
 - **Where is your test?** Is there a test in your change that failed before your fix, and would catch this bug if it came back?
-- **Does the unsaved note show up in the list?** Building the note with `@trail.notes.new` adds it to the trail's notes, so the page tries to draw a note that was never saved.
+- **Did you hit the unsaved note in the list?** Building the note with `@trail.notes.new` adds it to the trail's notes, so the page breaks trying to draw a note that was never saved. If your fix avoids it, can you say why?
 - **Would a hiker understand the error?** Read the message out loud as Dana would see it.
 - **Does your commit message say why,** not only what?
 - **Anything you noticed but left alone?** A hiker can't see the 500-character limit until they hit it. That's a good next ticket, not part of this one.

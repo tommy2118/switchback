@@ -1,0 +1,6 @@
+# Errors a fix for this ticket often runs into, and a nudge for each. A hint shows when a crash's message matches.
+- match: "nil can't be converted to a Time value"
+  hint: >-
+    The page broke while drawing the trail's notes. Building the note with `@trail.notes.new` adds it to the
+    trail's notes before it's saved, so the page tries to draw a note with no `created_at`. Build it without adding
+    it to the list, or leave unsaved notes out when you draw the list.
