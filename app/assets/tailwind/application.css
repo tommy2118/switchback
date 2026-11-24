@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+/* Rails wraps a field with errors in a div. In a flex form that div becomes the flex item and the field shrinks, so
+   let the field lay out as if the wrapper weren't there. */
+.field_with_errors {
+  display: contents;
+}
