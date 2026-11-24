@@ -48,7 +48,7 @@ jobs:
           mkdir -p test/acceptance
           cp ".review/tickets/$TICKET/acceptance_test.rb" test/acceptance/
           bin/rails db:test:prepare
-          bin/rails test test/acceptance --verbose > acceptance.txt 2>&1 || true
+          bin/rails test test/acceptance --verbose 2>&1 | tee acceptance.txt || true
           ruby .review/bin/review_comment "$TICKET" acceptance.txt > comment.md
 
       - name: Comment on the pull request
