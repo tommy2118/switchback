@@ -2,8 +2,7 @@ class NotesController < ApplicationController
   before_action :set_trail
 
   def create
-    @note = @trail.notes.new(note_params)
-    @note.author = Current.user
+    @note = Note.new(note_params.merge(trail: @trail, author: Current.user))
     if @note.save
       redirect_to @trail, notice: "Note posted."
     else
