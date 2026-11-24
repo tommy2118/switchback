@@ -15,4 +15,13 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     post trail_notes_path(trails(:eagle_ridge)), params: { note: { body: "Hello" } }
     assert_redirected_to new_session_path
   end
+
+  test "a note that's too long isn't posted, and says why" do
+    sign_in_as users(:sam)
+
+    assert_no_difference -> { Note.count } do
+      post trail_notes_path(trails(:eagle_ridge)), params: { note: { body: "x" * 501 } }
+    end
+    assert_response :unprocessable_content
+  end
 end
