@@ -2,10 +2,12 @@ class NotesController < ApplicationController
   before_action :set_trail
 
   def create
-    @note = @trail.notes.new(note_params)
-    @note.author = Current.user
-    @note.save
-    redirect_to @trail, notice: "Note posted."
+    @note = Note.new(note_params.merge(trail: @trail, author: Current.user))
+    if @note.save
+      redirect_to @trail, notice: "Note posted."
+    else
+      render "trails/show", status: :unprocessable_content
+    end
   end
 
   private

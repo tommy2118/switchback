@@ -12,6 +12,7 @@
     <% end %>
   </div>
   <%= form_with model: [ @trail, @note ], class: "mt-6 flex gap-3" do |form| %>
+    <% if @note.errors.any? %><p class="w-full text-red-800"><%= @note.errors.full_messages.to_sentence %></p><% end %>
     <%= form.text_area :body, rows: 2, placeholder: "How was the trail?", class: "flex-1 rounded border border-stone-300 p-2" %>
     <%= form.submit "Post note", class: "self-start rounded bg-emerald-700 px-4 py-2 font-semibold text-white" %>
   <% end %>
