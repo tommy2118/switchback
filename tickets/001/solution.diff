@@ -20,7 +20,7 @@ index e654f80..d963f4b 100644
  
    private
 diff --git a/app/views/trails/show.html.erb b/app/views/trails/show.html.erb
-index 3b51dd4..2436cfd 100644
+index 2fc8bd3..ac3f206 100644
 --- a/app/views/trails/show.html.erb
 +++ b/app/views/trails/show.html.erb
 @@ -11,6 +11,7 @@
@@ -31,3 +31,15 @@ index 3b51dd4..2436cfd 100644
    <%= form_with model: [ @trail, @note ], class: "mt-6 flex gap-3" do |form| %>
      <%= form.text_area :body, rows: 2, placeholder: "How was the trail?", class: "flex-1 rounded border border-stone-300 p-2" %>
      <%= form.submit "Post note", class: "self-start rounded bg-emerald-700 px-4 py-2 font-semibold text-white" %>
+diff --git a/config/locales/en.yml b/config/locales/en.yml
+index 6c349ae..ae98e4a 100644
+--- a/config/locales/en.yml
++++ b/config/locales/en.yml
+@@ -29,3 +29,7 @@
+ 
+ en:
+   hello: "Hello world"
++  activerecord:
++    attributes:
++      note:
++        body: "Your note"
