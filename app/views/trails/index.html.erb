@@ -1,0 +1,10 @@
+<% content_for :title, "Trails · Switchback" %>
+<h1 class="text-3xl font-bold">Trails</h1>
+<ul class="mt-6 divide-y divide-stone-200 rounded-lg bg-white shadow-sm">
+  <% @trails.each do |trail| %>
+    <li class="p-4">
+      <%= link_to trail.name, trail, class: "font-semibold text-emerald-800 hover:underline" %>
+      <span class="text-sm text-stone-500"><%= trail.miles %> mi · <%= number_with_delimiter(trail.gain_feet) %> ft gain · <%= trail.difficulty %></span>
+    </li>
+  <% end %>
+</ul>

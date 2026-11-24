@@ -1,0 +1,3 @@
+<p><%= @note.author.name %> left a note on <%= @note.trail.name %>:</p>
+<blockquote><%= @note.body %></blockquote>
+<p><%= link_to "See the trail", trail_url(@note.trail) %></p>

@@ -1,0 +1,4 @@
+<article id="<%= dom_id(note) %>" class="rounded bg-white p-3 shadow-sm">
+  <p class="text-sm text-stone-500"><%= note.author.name %> · <%= time_ago_in_words(note.created_at) %> ago</p>
+  <p class="mt-1"><%= note.body %></p>
+</article>
