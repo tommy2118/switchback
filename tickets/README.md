@@ -27,3 +27,4 @@ You'll learn more if you look after you've tried.
 ## Tickets
 
 - [001: Notes vanish sometimes](001-notes-vanish.md)
+- [002: Eagle Ridge's page is slow](002-eagle-ridge-slow.md)
