@@ -1,5 +1,6 @@
 # Reviews a pull request whose branch starts with a ticket number, such as 001-notes-vanish: runs that ticket's
 # acceptance tests and comments on what passes. The tests live on Switchback's review branch, not in this code.
+# Every run leaves a review in its summary, and in a comment when the pull request is inside the fork.
 name: Ticket review
 
 on:
@@ -11,7 +12,6 @@ permissions:
 
 jobs:
   review:
-    if: ${{ github.head_ref != '' }}
     runs-on: ubuntu-latest
     env:
       BRANCH: ${{ github.head_ref }}
@@ -19,7 +19,16 @@ jobs:
     steps:
       - name: Find the ticket
         id: ticket
-        run: echo "number=$(printf '%s' "$BRANCH" | grep -oE '^[0-9]{3}' || true)" >> "$GITHUB_OUTPUT"
+        run: |
+          number=$(printf '%s' "$BRANCH" | grep -oE '^[0-9]{3}' || true)
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+          if [ -z "$number" ]; then
+            printf '%s\n' "## CI review" "" "This branch doesn't start with a ticket number, so there's no ticket to review." \
+              "Name your branch for the ticket, like \`001-notes-vanish\`, and push it again." > "$RUNNER_TEMP/comment.md"
+          else
+            printf '%s\n' "## Ticket $number: CI review" "" "The review stopped before the acceptance tests ran." \
+              "Open this run's log to see where: setting up Ruby, installing gems, or preparing the database." > "$RUNNER_TEMP/comment.md"
+          fi
 
       - name: Checkout code
         if: steps.ticket.outputs.number != ''
@@ -45,15 +54,27 @@ jobs:
           RAILS_ENV: test
           TICKET: ${{ steps.ticket.outputs.number }}
         run: |
+          if [ ! -f ".review/tickets/$TICKET/acceptance_test.rb" ]; then
+            printf '%s\n' "## Ticket $TICKET: CI review" "" "There's no ticket $TICKET. Check the number at the start of your branch's name." > "$RUNNER_TEMP/comment.md"
+            exit 1
+          fi
           mkdir -p test/acceptance
           cp ".review/tickets/$TICKET/acceptance_test.rb" test/acceptance/
           bin/rails db:test:prepare
           bin/rails test test/acceptance --verbose 2>&1 | tee acceptance.txt || true
-          ruby .review/bin/review_comment "$TICKET" acceptance.txt > comment.md
+          ruby .review/bin/review_comment "$TICKET" acceptance.txt > "$RUNNER_TEMP/comment.md"
 
+      - name: Write the review to the run's summary
+        if: always()
+        run: cat "$RUNNER_TEMP/comment.md" >> "$GITHUB_STEP_SUMMARY"
+
+      # A pull request into another repository gets a read-only token, so it can't comment; the summary still has it.
       - name: Comment on the pull request
-        if: steps.ticket.outputs.number != ''
+        if: always() && github.event.pull_request.head.repo.full_name == github.repository
         env:
           GH_TOKEN: ${{ github.token }}
           PR: ${{ github.event.pull_request.number }}
-        run: gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file comment.md
+        run: gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --edit-last --body-file "$RUNNER_TEMP/comment.md" || gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/comment.md"
+
+      - name: Pass only when every criterion passes
+        run: grep -q '^Every acceptance criterion passes' "$RUNNER_TEMP/comment.md"
