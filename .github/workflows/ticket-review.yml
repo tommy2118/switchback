@@ -39,7 +39,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: ${{ env.UPSTREAM }}
-          ref: review
+          ref: review-003-draft
           path: .review
 
       - name: Set up Ruby
