@@ -15,4 +15,15 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     post trail_notes_path(trails(:eagle_ridge)), params: { note: { body: "Hello" } }
     assert_redirected_to new_session_path
   end
+
+  test "a note over 500 characters isn't posted, and the hiker keeps their words" do
+    sign_in_as users(:sam)
+
+    assert_no_difference -> { Note.count } do
+      post trail_notes_path(trails(:eagle_ridge)), params: { note: { body: "x" * 501 } }
+    end
+    assert_response :unprocessable_content
+    assert_select "textarea[name='note[body]']", text: "x" * 501
+    assert_match "too long", response.body
+  end
 end
