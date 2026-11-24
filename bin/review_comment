@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+# Writes the pull request comment for a ticket from its acceptance tests' verbose output. It says only what the
+# tests proved: each criterion passed or didn't. When all pass, it adds what a human reviewer would still ask.
+# Usage: review_comment <ticket number> <test output file>
+ticket, output_path = ARGV
+output = File.read(output_path)
+root = File.expand_path("..", __dir__)
+marks = output.scan(/^Ticket\d+Test#(test_.+?) = [\d.]+ s = ([.FES])$/).to_h
+criteria = File.read(File.join(root, "tickets", ticket, "acceptance_test.rb")).scan(/^\s*test "(.+)" do$/).flatten
+results = criteria.filter_map { |criterion| [ criterion, marks["test_#{criterion.gsub(/\s+/, "_")}"] == "." ] if marks.key?("test_#{criterion.gsub(/\s+/, "_")}") }
+
+puts "## Ticket #{ticket}: CI review", ""
+if results.empty?
+  puts "The acceptance tests couldn't run, so there's nothing to review yet. The end of their output:", "",
+       "```", output.lines.last(25).join.strip, "```"
+  exit
+end
+
+results.each { |criterion, passed| puts "#{passed ? "✅" : "❌"} #{criterion}" }
+passed = results.count { it[1] }
+puts ""
+if passed == results.size
+  puts "Every acceptance criterion passes. Before approving, a human reviewer would still ask:", ""
+  puts File.read(File.join(root, "tickets", ticket, "reviewer.md")).strip
+else
+  puts "#{passed} of #{results.size} criteria pass. Each ❌ is something the hiker still runs into. The failures " \
+       "are in this run's log, under \"Run the acceptance tests\"."
+end
+puts "", "<sub>This review says only what the ticket's acceptance tests prove.</sub>"

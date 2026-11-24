@@ -1,0 +1,33 @@
+diff --git a/app/controllers/notes_controller.rb b/app/controllers/notes_controller.rb
+index e654f80..d963f4b 100644
+--- a/app/controllers/notes_controller.rb
++++ b/app/controllers/notes_controller.rb
+@@ -2,10 +2,12 @@ class NotesController < ApplicationController
+   before_action :set_trail
+ 
+   def create
+-    @note = @trail.notes.new(note_params)
+-    @note.author = Current.user
+-    @note.save
+-    redirect_to @trail, notice: "Note posted."
++    @note = Note.new(note_params.merge(trail: @trail, author: Current.user))
++    if @note.save
++      redirect_to @trail, notice: "Note posted."
++    else
++      render "trails/show", status: :unprocessable_content
++    end
+   end
+ 
+   private
+diff --git a/app/views/trails/show.html.erb b/app/views/trails/show.html.erb
+index 3b51dd4..43aef30 100644
+--- a/app/views/trails/show.html.erb
++++ b/app/views/trails/show.html.erb
+@@ -12,6 +12,7 @@
+     <% end %>
+   </div>
+   <%= form_with model: [ @trail, @note ], class: "mt-6 flex gap-3" do |form| %>
++    <% if @note.errors.any? %><p class="w-full text-red-800"><%= @note.errors.full_messages.to_sentence %></p><% end %>
+     <%= form.text_area :body, rows: 2, placeholder: "How was the trail?", class: "flex-1 rounded border border-stone-300 p-2" %>
+     <%= form.submit "Post note", class: "self-start rounded bg-emerald-700 px-4 py-2 font-semibold text-white" %>
+   <% end %>
