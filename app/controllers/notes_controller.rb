@@ -4,8 +4,11 @@ class NotesController < ApplicationController
   def create
     @note = @trail.notes.new(note_params)
     @note.author = Current.user
-    @note.save
-    redirect_to @trail, notice: "Note posted."
+    if @note.save
+      redirect_to @trail, notice: "Note posted."
+    else
+      render "trails/show", status: :unprocessable_content
+    end
   end
 
   private
