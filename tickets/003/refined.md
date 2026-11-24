@@ -3,11 +3,11 @@
 **Story:** As a hiker writing a long trail report on my phone, I want to see how much room I have left as I type, so
 I can trim my note before I post it, not after.
 
-**Reproduce:** sign in, open any trail, and look at the note form. Nothing says there's a limit. Type or paste 600
+**What happens today:** sign in, open any trail, and look at the note form. Nothing says there's a limit. Type or paste 600
 characters and post. With ticket 001 fixed, the page says the note is too long, but not by how much. Either way, the
 hiker finds out only after writing the whole note.
 
-**Cause:** the 500-character limit lives only in `Note`'s validation, which runs on the server after the hiker posts.
+**Why it happens:** the 500-character limit lives only in `Note`'s validation, which runs on the server after the hiker posts.
 The form never mentions it.
 
 ## Acceptance criteria
